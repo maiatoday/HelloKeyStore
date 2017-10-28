@@ -4,4 +4,7 @@
     <string name="secret_message_hint">Super secret message here</string>
     <string name="plain_text">Plain text</string>
     <string name="encrypted_text">Encrypted text</string>
+    <string name="key_alias">Key alias</string>
+    <string name="activity_keys_title">Keys</string>
+
 </resources>
