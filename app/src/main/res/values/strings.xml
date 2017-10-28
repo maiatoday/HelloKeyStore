@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">HelloKeyStore</string>
+    <string name="action_settings">Settings</string>
+    <string name="secret_message_hint">Super secret message here</string>
+    <string name="plain_text">Plain text</string>
+    <string name="encrypted_text">Encrypted text</string>
+</resources>
