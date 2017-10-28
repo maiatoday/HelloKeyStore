@@ -3,10 +3,14 @@ package net.maiatoday.hellokeystore
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import net.maiatoday.keystorehelper.generateKeyPair
+import net.maiatoday.keystorehelper.rsaDecrypt
+import net.maiatoday.keystorehelper.rsaEncrypt
 
 class MainActivity : AppCompatActivity() {
 
@@ -18,10 +22,24 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         prefs = Prefs(this)
         keyAlias.setText(prefs.keyAlias)
-        secretMessageEncrypted.text=prefs.secretMessageEncrypted
+        secretMessageEncrypted.text = prefs.secretMessageEncrypted
+        secretMessagePlain.text = rsaDecrypt(prefs.secretMessageEncrypted.toByteArray(), prefs.keyAlias).toString()
 
         fab.setOnClickListener { view ->
             startActivity(Intent(this, KeysActivity::class.java))
+        }
+        buttonLock.setOnClickListener { view ->
+
+            val keyAlias = keyAlias.text.toString()
+            val message = secretMessage.text.toString()
+            if (!TextUtils.isEmpty(message) &&
+                    !TextUtils.isEmpty(keyAlias)) {
+                generateKeyPair(this, keyAlias)
+                val encryptedMessage = rsaEncrypt(message.toByteArray(), keyAlias)
+                prefs.secretMessageEncrypted = encryptedMessage.toString()
+                secretMessageEncrypted.text = encryptedMessage.toString()
+
+            }
         }
     }
 

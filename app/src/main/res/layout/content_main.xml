@@ -78,31 +78,32 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:text="@string/plain_text"
         android:textColor="@color/accent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonUnlock" />
+        app:layout_constraintTop_toBottomOf="@+id/secretMessageEncrypted" />
 
     <TextView
         android:id="@+id/labelEncryptedText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:text="@string/encrypted_text"
         android:textColor="@color/accent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/secretMessageInputLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/keyAliasInputLayout" />
 
     <TextView
         android:id="@+id/secretMessagePlain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageView6"
         app:layout_constraintTop_toBottomOf="@+id/labelPlainText"
         tools:text="Twas brillig and the the slyteh toves" />
 
@@ -110,10 +111,11 @@
         android:id="@+id/secretMessageEncrypted"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageView5"
         app:layout_constraintTop_toBottomOf="@+id/labelEncryptedText"
         tools:text="oxoxoxoxoxoxoxoxoxoxoxoxoxoxoxo" />
 
@@ -122,36 +124,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/secretMessageInputLayout"
+        android:tint="@color/accent"
+        app:layout_constraintBottom_toBottomOf="@+id/keyAliasInputLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/secretMessageInputLayout"
-        app:srcCompat="@drawable/ic_lock_outline_black_24dp" />
-
-    <ImageButton
-        android:id="@+id/buttonUnlock"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/secretMessageEncrypted"
-        app:srcCompat="@drawable/ic_lock_open_black_24dp" />
+        app:srcCompat="@drawable/ic_vpn_key_black_24dp" />
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/keyAliasInputLayout"
         android:layout_width="0dp"
         android:layout_height="53dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toStartOf="@+id/buttonLock"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/secretMessagePlain"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toBottomOf="@+id/secretMessageInputLayout">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/keyAlias"
@@ -160,6 +148,26 @@
             android:hint="@string/key_alias"
             android:maxLines="1" />
     </android.support.design.widget.TextInputLayout>
+
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/secretMessageEncrypted"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/secretMessageEncrypted"
+        app:srcCompat="@drawable/ic_lock_outline_black_24dp" />
+
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/secretMessagePlain"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/secretMessagePlain"
+        app:srcCompat="@drawable/ic_lock_open_black_24dp" />
 
 
 </android.support.constraint.ConstraintLayout>

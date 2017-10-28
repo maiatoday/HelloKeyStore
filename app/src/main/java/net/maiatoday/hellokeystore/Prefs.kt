@@ -17,6 +17,6 @@ class Prefs (context: Context) {
         set(value) = prefs.edit().putString(SECRET_MESSAGE_ENCRYPTED, value).apply()
 
     var keyAlias: String
-        get() = prefs.getString(KEY_ALIAS, "testAlias")
+        get() = prefs.getString(KEY_ALIAS, "HelloKeyStore")
         set(value) = prefs.edit().putString(KEY_ALIAS, value).apply()
 }
