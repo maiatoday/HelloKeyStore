@@ -23,21 +23,24 @@ class MainActivity : AppCompatActivity() {
         prefs = Prefs(this)
         keyAlias.setText(prefs.keyAlias)
         secretMessageEncrypted.text = prefs.secretMessageEncrypted
-        secretMessagePlain.text = rsaDecrypt(prefs.secretMessageEncrypted.toByteArray(), prefs.keyAlias).toString()
+        val decryptedMessage = String(rsaDecrypt(prefs.secretMessageEncrypted.toByteArray(), prefs.keyAlias))
+        secretMessagePlain.text = decryptedMessage
+        secretMessage.setText(decryptedMessage)
 
         fab.setOnClickListener { view ->
             startActivity(Intent(this, KeysActivity::class.java))
         }
         buttonLock.setOnClickListener { view ->
 
-            val keyAlias = keyAlias.text.toString()
+            val keyAliasString = keyAlias.text.toString()
             val message = secretMessage.text.toString()
             if (!TextUtils.isEmpty(message) &&
-                    !TextUtils.isEmpty(keyAlias)) {
-                generateKeyPair(this, keyAlias)
-                val encryptedMessage = rsaEncrypt(message.toByteArray(), keyAlias)
-                prefs.secretMessageEncrypted = encryptedMessage.toString()
-                secretMessageEncrypted.text = encryptedMessage.toString()
+                    !TextUtils.isEmpty(keyAliasString)) {
+                generateKeyPair(this, keyAliasString)
+                val encryptedMessage = rsaEncrypt(message.toByteArray(), keyAliasString)
+                prefs.secretMessageEncrypted = String(encryptedMessage)
+                secretMessageEncrypted.text =  String(encryptedMessage)
+                prefs.keyAlias = keyAlias.text.toString()
 
             }
         }
