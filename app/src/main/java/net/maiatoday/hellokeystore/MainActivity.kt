@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import net.maiatoday.keystorehelper.EncryptedCombo
 import net.maiatoday.keystorehelper.generateKeyPair
 import net.maiatoday.keystorehelper.rsaDecrypt
 import net.maiatoday.keystorehelper.rsaEncrypt
@@ -23,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         prefs = Prefs(this)
         keyAlias.setText(prefs.keyAlias)
         secretMessageEncrypted.text = prefs.secretMessageEncrypted
-        val decryptedMessage = String(rsaDecrypt(prefs.secretMessageEncrypted.toByteArray(), prefs.keyAlias))
+        val decryptedMessage = String(rsaDecrypt(EncryptedCombo(prefs.secretMessageEncrypted.toByteArray(), prefs.iv), prefs.keyAlias))
         secretMessagePlain.text = decryptedMessage
         secretMessage.setText(decryptedMessage)
 
@@ -36,12 +37,16 @@ class MainActivity : AppCompatActivity() {
             val message = secretMessage.text.toString()
             if (!TextUtils.isEmpty(message) &&
                     !TextUtils.isEmpty(keyAliasString)) {
+                // Generate a key pair if it doesn't exist in the KeyStore already
                 generateKeyPair(this, keyAliasString)
-                val encryptedMessage = rsaEncrypt(message.toByteArray(), keyAliasString)
-                prefs.secretMessageEncrypted = String(encryptedMessage)
-                secretMessageEncrypted.text =  String(encryptedMessage)
+                // Encrypt the message with the key accessing it with the alias
+                val (cipherBytes, iv) = rsaEncrypt(message.toByteArray(), keyAliasString)
+                // For this example store the encrypted message, the initialisation vector that was used and the key alias in the preferences
+                prefs.secretMessageEncrypted = String(cipherBytes)
+                prefs.iv = iv
                 prefs.keyAlias = keyAlias.text.toString()
-
+                // For visual feedback to the user show the encrypted message on the screen
+                secretMessageEncrypted.text =  String(cipherBytes)
             }
         }
     }
