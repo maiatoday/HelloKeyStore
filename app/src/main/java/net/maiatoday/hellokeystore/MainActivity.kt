@@ -25,8 +25,9 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         prefs = Prefs(this)
         keyAlias.setText(prefs.keyAlias)
+//        val decryptedMessagexx = String(rsaDecrypt(EncryptedCombo(prefs.secretMessageEncrypted, prefs.iv), prefs.keyAlias))
+        val decryptedMessage = "urk"
         secretMessageEncrypted.text = String(prefs.secretMessageEncrypted)
-        val decryptedMessage = String(rsaDecrypt(EncryptedCombo(prefs.secretMessageEncrypted, prefs.iv), prefs.keyAlias))
         secretMessagePlain.text = decryptedMessage
         secretMessage.setText(decryptedMessage)
 

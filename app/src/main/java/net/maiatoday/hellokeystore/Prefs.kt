@@ -8,11 +8,11 @@ import android.util.Base64
  * Created by maia on 2017/10/28.
  */
 class Prefs(context: Context) {
-    val PREFS_FILENAME = "net.maiatoday.hellokeystore.prefs"
-    val SECRET_MESSAGE_ENCRYPTED = "secret_message"
-    val KEY_ALIAS = "key_alias"
-    val IV = "iv"
-    val prefs: SharedPreferences = context.getSharedPreferences(PREFS_FILENAME, 0);
+    private val PREFS_FILENAME = "net.maiatoday.hellokeystore.prefs"
+    private val SECRET_MESSAGE_ENCRYPTED = "secret_message"
+    private val KEY_ALIAS = "key_alias"
+    private val IV = "iv"
+    private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_FILENAME, 0);
 
     var secretMessageEncrypted: ByteArray
         get() = prefs.getString(SECRET_MESSAGE_ENCRYPTED, "").toByteArray(Charsets.ISO_8859_1)
