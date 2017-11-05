@@ -40,7 +40,8 @@ class MainActivity : AppCompatActivity() {
                 // Generate a key pair if it doesn't exist in the KeyStore already
                 generateKeyPair(this, keyAliasString)
                 // Encrypt the message with the key accessing it with the alias
-                val (cipherBytes, iv) = rsaEncrypt(message.toByteArray(), keyAliasString)
+                val clearBytes:ByteArray = message.toByteArray()
+                val (cipherBytes, iv) = rsaEncrypt(clearBytes, keyAliasString)
                 // For this example store the encrypted message, the initialisation vector that was used and the key alias in the preferences
                 prefs.secretMessageEncrypted = String(cipherBytes)
                 prefs.iv = iv

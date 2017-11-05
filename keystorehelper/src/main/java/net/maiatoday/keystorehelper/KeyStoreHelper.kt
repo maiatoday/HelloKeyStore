@@ -24,7 +24,8 @@ import javax.crypto.spec.GCMParameterSpec
 // https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3
 
 private val AndroidKeyStore = "AndroidKeyStore"
-private val RSA_MODE = "RSA/ECB/PKCS1Padding";
+private val RSA_MODE = "RSA/ECB/PKCS1Padding"
+private val AES_MODE = "AES/GCM/NoPadding"
 
 fun generateKeyPair(context: Context, keyAlias: String) {
     val keyStore = accessKeyStore()
@@ -60,6 +61,19 @@ fun generateKeyPair(context: Context, keyAlias: String) {
     }
 }
 
+fun deleteKeyPair(keyAlias: String) {
+    val keyStore = accessKeyStore()
+    if (keyStore.containsAlias(keyAlias)) {
+        keyStore.deleteEntry(keyAlias)
+    }
+}
+
+
+fun listAliases(): Enumeration<String>? {
+    val keyStore = accessKeyStore()
+    return keyStore.aliases()
+}
+
 
 /**
  * Created by maia on 2017/10/28.
@@ -80,7 +94,7 @@ fun rsaEncrypt(clearBytes: ByteArray, keyAlias: String): EncryptedCombo {
 
                 return EncryptedCombo(outputStream.toByteArray(), inputCipher.iv ?: kotlin.ByteArray(0))
             } else {
-                val c: Cipher = Cipher.getInstance(RSA_MODE)
+                val c: Cipher = Cipher.getInstance(AES_MODE)
                 val iv = generateIV()
                 c.init(Cipher.ENCRYPT_MODE, privateKeyEntry.certificate?.publicKey, GCMParameterSpec(128, iv))
                 val encodedBytes = c.doFinal(clearBytes)
@@ -95,28 +109,29 @@ fun rsaEncrypt(clearBytes: ByteArray, keyAlias: String): EncryptedCombo {
 @Throws(Exception::class)
 fun rsaDecrypt(encryptedCombo: EncryptedCombo, keyAlias: String): ByteArray {
     if (!keyAlias.isEmpty()) {
-        val privateKeyEntry = accessPrivateKeyEntry(keyAlias)
-        if (privateKeyEntry != null) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            val keyEntry = accessPrivateKeyEntry(keyAlias)
+            if (keyEntry != null) {
                 val output = Cipher.getInstance(RSA_MODE, "AndroidOpenSSL")
-                output.init(Cipher.DECRYPT_MODE, privateKeyEntry.privateKey)
+                output.init(Cipher.DECRYPT_MODE, keyEntry.privateKey)
                 val cipherInputStream = CipherInputStream(
                         ByteArrayInputStream(encryptedCombo.cipherBytes), output)
 
-                val values = cipherInputStream.bufferedReader().use { it.readText() }
-                return values.toByteArray(Charset.defaultCharset())
-
-            } else {
-                val key = accessPrivateKeyEntry(keyAlias)?.privateKey
-                if (key != null) {
-                    val c = Cipher.getInstance(RSA_MODE)
-                    c.init(Cipher.DECRYPT_MODE, privateKeyEntry.privateKey, GCMParameterSpec(128, encryptedCombo.iv))
-                    return c.doFinal(encryptedCombo.cipherBytes)
-                }
-
+                val values = cipherInputStream.readBytes()
+                cipherInputStream.close()
+                return values
             }
+
+        } else {
+            val keyEntry = accessSecretKeyEntry(keyAlias)
+            if (keyEntry != null) {
+                val c = Cipher.getInstance(AES_MODE)
+                c.init(Cipher.DECRYPT_MODE, keyEntry.secretKey, GCMParameterSpec(128, encryptedCombo.iv))
+                return c.doFinal(encryptedCombo.cipherBytes)
+            }
+
         }
+
     }
     return kotlin.ByteArray(0)
 }
@@ -129,12 +144,24 @@ fun accessKeyStore(): KeyStore {
 
 fun accessPrivateKeyEntry(keyAlias: String): KeyStore.PrivateKeyEntry? {
     val keyStore = accessKeyStore()
-    return keyStore.getEntry(keyAlias, null) as? KeyStore.PrivateKeyEntry
+    val entry = keyStore.getEntry(keyAlias, null)
+    return entry as? KeyStore.PrivateKeyEntry
+}
+
+fun accessSecretKeyEntry(keyAlias: String): KeyStore.SecretKeyEntry? {
+    val keyStore = accessKeyStore()
+    val entry = keyStore.getEntry(keyAlias, null)
+    return entry as? KeyStore.SecretKeyEntry
+}
+
+fun accessAlias(keyAlias: String): KeyStore.Entry? {
+    val keyStore = accessKeyStore()
+    return keyStore.getEntry(keyAlias, null)
 }
 
 fun generateIV(): ByteArray {
     val r = SecureRandom()
-    val ivBytes = ByteArray(16)
+    val ivBytes = ByteArray(12)
     r.nextBytes(ivBytes)
     return ivBytes
 }
