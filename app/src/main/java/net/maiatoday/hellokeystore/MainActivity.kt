@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_main.*
@@ -14,6 +15,7 @@ import net.maiatoday.keystorehelper.rsaDecrypt
 import net.maiatoday.keystorehelper.rsaEncrypt
 
 class MainActivity : AppCompatActivity() {
+    private val TAG = MainActivity::class.java.simpleName
 
     lateinit var prefs: Prefs
 
@@ -23,8 +25,8 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         prefs = Prefs(this)
         keyAlias.setText(prefs.keyAlias)
-        secretMessageEncrypted.text = prefs.secretMessageEncrypted
-        val decryptedMessage = String(rsaDecrypt(EncryptedCombo(prefs.secretMessageEncrypted.toByteArray(), prefs.iv), prefs.keyAlias))
+        secretMessageEncrypted.text = String(prefs.secretMessageEncrypted)
+        val decryptedMessage = String(rsaDecrypt(EncryptedCombo(prefs.secretMessageEncrypted, prefs.iv), prefs.keyAlias))
         secretMessagePlain.text = decryptedMessage
         secretMessage.setText(decryptedMessage)
 
@@ -41,13 +43,18 @@ class MainActivity : AppCompatActivity() {
                 generateKeyPair(this, keyAliasString)
                 // Encrypt the message with the key accessing it with the alias
                 val clearBytes:ByteArray = message.toByteArray()
-                val (cipherBytes, iv) = rsaEncrypt(clearBytes, keyAliasString)
+                val encryptedCombo = rsaEncrypt(clearBytes, keyAliasString)
                 // For this example store the encrypted message, the initialisation vector that was used and the key alias in the preferences
-                prefs.secretMessageEncrypted = String(cipherBytes)
-                prefs.iv = iv
-                prefs.keyAlias = keyAlias.text.toString()
+                prefs.secretMessageEncrypted = encryptedCombo.cipherBytes
+                prefs.iv = encryptedCombo.iv
+                prefs.keyAlias = keyAliasString
                 // For visual feedback to the user show the encrypted message on the screen
-                secretMessageEncrypted.text =  String(cipherBytes)
+                secretMessageEncrypted.text =  String(encryptedCombo.cipherBytes)
+                val decryptedMessage = String(rsaDecrypt(encryptedCombo, prefs.keyAlias))
+                secretMessagePlain.text = decryptedMessage
+                val decryptedMessage2 = String(rsaDecrypt(EncryptedCombo(prefs.secretMessageEncrypted, prefs.iv), prefs.keyAlias))
+                Log.d(TAG, "decrypted message from prefs = "+decryptedMessage2)
+
             }
         }
     }
