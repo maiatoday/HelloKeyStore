@@ -2,24 +2,23 @@ package net.maiatoday.keystorehelper
 
 import android.content.Context
 import android.os.Build
+import android.security.KeyPairGeneratorSpec
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.lang.Exception
+import java.math.BigInteger
+import java.security.KeyPairGenerator
 import java.security.KeyStore
+import java.security.SecureRandom
+import java.util.*
 import javax.crypto.Cipher
 import javax.crypto.CipherInputStream
 import javax.crypto.CipherOutputStream
-import android.security.keystore.KeyProperties
-import android.security.KeyPairGeneratorSpec
-import java.math.BigInteger
-import java.security.KeyPairGenerator
-import javax.security.auth.x500.X500Principal
-import android.security.keystore.KeyGenParameterSpec
-import java.util.*
-import java.nio.charset.Charset
-import java.security.SecureRandom
 import javax.crypto.KeyGenerator
 import javax.crypto.spec.GCMParameterSpec
+import javax.security.auth.x500.X500Principal
 
 // https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3
 
@@ -81,26 +80,30 @@ fun listAliases(): Enumeration<String>? {
 @Throws(Exception::class)
 fun rsaEncrypt(clearBytes: ByteArray, keyAlias: String): EncryptedCombo {
     if (!keyAlias.isEmpty()) {
-        val privateKeyEntry = accessPrivateKeyEntry(keyAlias)
-        if (privateKeyEntry != null) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            val keyEntry = accessPrivateKeyEntry(keyAlias)
+            if (keyEntry != null) {
                 // Encrypt the text
                 val inputCipher = Cipher.getInstance(RSA_MODE, "AndroidOpenSSL")
-                inputCipher.init(Cipher.ENCRYPT_MODE, privateKeyEntry.certificate?.publicKey)
+                inputCipher.init(Cipher.ENCRYPT_MODE, keyEntry.certificate?.publicKey)
                 val outputStream = ByteArrayOutputStream()
                 val cipherOutputStream = CipherOutputStream(outputStream, inputCipher)
                 cipherOutputStream.write(clearBytes)
                 cipherOutputStream.close()
 
                 return EncryptedCombo(outputStream.toByteArray(), inputCipher.iv ?: kotlin.ByteArray(0))
-            } else {
+            }
+        } else {
+            val keyEntry = accessSecretKeyEntry(keyAlias)
+            if (keyEntry != null) {
                 val c: Cipher = Cipher.getInstance(AES_MODE)
                 val iv = generateIV()
-                c.init(Cipher.ENCRYPT_MODE, privateKeyEntry.certificate?.publicKey, GCMParameterSpec(128, iv))
+                c.init(Cipher.ENCRYPT_MODE, keyEntry.secretKey, GCMParameterSpec(128, iv))
                 val encodedBytes = c.doFinal(clearBytes)
                 return EncryptedCombo(encodedBytes, iv)
             }
         }
+
     }
     return EncryptedCombo(kotlin.ByteArray(0), kotlin.ByteArray(0))
 }

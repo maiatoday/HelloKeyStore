@@ -32,7 +32,7 @@ class KeyStoreHelperKtTest {
     @Test
     fun generateKeyPairTest() {
         //GIVEN an alias string
-        val alias = "someString"
+        val alias = "ttt"
         //WHEN we generate a key
         generateKeyPair(InstrumentationRegistry.getTargetContext(), alias)
         //THEN the key entry is accessible and not null
