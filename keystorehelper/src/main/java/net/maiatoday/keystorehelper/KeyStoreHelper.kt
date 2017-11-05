@@ -54,6 +54,7 @@ fun generateKeyPair(context: Context, keyAlias: String) {
                             KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
                             .setBlockModes(KeyProperties.BLOCK_MODE_GCM).setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
                             .setRandomizedEncryptionRequired(false)
+                       //     .setUserAuthenticationRequired(true)
                             .build())
             keyGenerator.generateKey()
         }
