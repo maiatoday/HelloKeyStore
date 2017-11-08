@@ -45,14 +45,14 @@ class KeyStoreHelperKtTest {
 
         //THEN the same key is returned when it is accessed.
         val keyEntry2 = accessAlias(alias)
-//        assertSame(keyEntry1, keyEntry2)
+        //TODO need to check that we didn't regenerate a keypair
 
         deleteKeyPair(alias)
     }
 
 
     @Test
-    fun rsaEncryptTest() {
+    fun encryptTest() {
         generateKeyPair(InstrumentationRegistry.getTargetContext(), keyAlias)
         val clearText = "Testing123"
         val encryptedCombo = encrypt(clearText.toByteArray(), keyAlias)
@@ -62,7 +62,7 @@ class KeyStoreHelperKtTest {
     }
 
     @Test
-    fun rsaDecryptTest() {
+    fun decryptTest() {
         generateKeyPair(InstrumentationRegistry.getTargetContext(), keyAlias)
         val clearText = "Testing123Testing123Testing123"
         val encryptedCombo = encrypt(clearText.toByteArray(), keyAlias)
@@ -117,7 +117,6 @@ class KeyStoreHelperKtTest {
         deleteKeyPair(alias3)
         val aliasEnumeration2 = listAliases()
         //THEN the aliases are no longer in the list
-        //THEN the alias are in the list
         val listDeleted = aliasEnumeration2?.toList() ?: listOf("")
         assert(!listDeleted.contains(alias1))
         assert(!listDeleted.contains(alias2))
