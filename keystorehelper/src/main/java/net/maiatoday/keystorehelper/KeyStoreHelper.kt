@@ -5,6 +5,7 @@ import android.os.Build
 import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import android.util.Log
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.lang.Exception
@@ -19,6 +20,9 @@ import javax.crypto.CipherOutputStream
 import javax.crypto.KeyGenerator
 import javax.crypto.spec.GCMParameterSpec
 import javax.security.auth.x500.X500Principal
+import java.security.Security
+import kotlin.collections.ArrayList
+
 
 // https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3
 
@@ -54,7 +58,7 @@ fun generateKeyPair(context: Context, keyAlias: String) {
                             KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
                             .setBlockModes(KeyProperties.BLOCK_MODE_GCM).setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
                             .setRandomizedEncryptionRequired(false)
-                       //     .setUserAuthenticationRequired(true)
+                            //     .setUserAuthenticationRequired(true)
                             .build())
             keyGenerator.generateKey()
         }
@@ -79,7 +83,7 @@ fun listAliases(): Enumeration<String>? {
  * Created by maia on 2017/10/28.
  */
 @Throws(Exception::class)
-fun rsaEncrypt(clearBytes: ByteArray, keyAlias: String): EncryptedCombo {
+fun encrypt(clearBytes: ByteArray, keyAlias: String): EncryptedCombo {
     if (!keyAlias.isEmpty()) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             val keyEntry = accessPrivateKeyEntry(keyAlias)
@@ -111,7 +115,7 @@ fun rsaEncrypt(clearBytes: ByteArray, keyAlias: String): EncryptedCombo {
 
 
 @Throws(Exception::class)
-fun rsaDecrypt(encryptedCombo: EncryptedCombo, keyAlias: String): ByteArray {
+fun decrypt(encryptedCombo: EncryptedCombo, keyAlias: String): ByteArray {
     if (!keyAlias.isEmpty()) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             val keyEntry = accessPrivateKeyEntry(keyAlias)
@@ -171,3 +175,15 @@ fun generateIV(): ByteArray {
 }
 
 data class EncryptedCombo(val cipherBytes: ByteArray, val iv: ByteArray)
+
+fun listSupportedAlgorithms(): List<String> {
+    val providerServiceList = ArrayList<String>()
+    val providers = Security.getProviders()
+    for (provider in providers) {
+        val services = provider.services
+        for (service in services) {
+            providerServiceList.add("provider: $provider.name --- algorithm: $service.algorithm")
+        }
+    }
+    return providerServiceList
+}

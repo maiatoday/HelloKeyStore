@@ -55,7 +55,7 @@ class KeyStoreHelperKtTest {
     fun rsaEncryptTest() {
         generateKeyPair(InstrumentationRegistry.getTargetContext(), keyAlias)
         val clearText = "Testing123"
-        val encryptedCombo = rsaEncrypt(clearText.toByteArray(), keyAlias)
+        val encryptedCombo = encrypt(clearText.toByteArray(), keyAlias)
         assert(encryptedCombo.cipherBytes.isNotEmpty())
         assert(encryptedCombo.iv.isNotEmpty())
         assert(encryptedCombo.cipherBytes!= clearText.toByteArray())
@@ -65,8 +65,8 @@ class KeyStoreHelperKtTest {
     fun rsaDecryptTest() {
         generateKeyPair(InstrumentationRegistry.getTargetContext(), keyAlias)
         val clearText = "Testing123Testing123Testing123"
-        val encryptedCombo = rsaEncrypt(clearText.toByteArray(), keyAlias)
-        val testClearText = rsaDecrypt(encryptedCombo, keyAlias)
+        val encryptedCombo = encrypt(clearText.toByteArray(), keyAlias)
+        val testClearText = decrypt(encryptedCombo, keyAlias)
         assertEquals(clearText, String(testClearText))
     }
 

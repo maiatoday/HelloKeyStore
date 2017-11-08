@@ -13,18 +13,17 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import net.maiatoday.keystorehelper.EncryptedCombo
 import net.maiatoday.keystorehelper.generateKeyPair
-import net.maiatoday.keystorehelper.rsaDecrypt
-import net.maiatoday.keystorehelper.rsaEncrypt
-import java.security.InvalidAlgorithmParameterException
-
-
-const val REQUEST_KEY_LIST: Int = 100
+import net.maiatoday.keystorehelper.decrypt
+import net.maiatoday.keystorehelper.encrypt
 
 class MainActivity : AppCompatActivity() {
     private val TAG = MainActivity::class.java.simpleName
 
     lateinit var prefs: Prefs
 
+    companion object {
+        const val REQUEST_KEY_LIST: Int = 100
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,16 +46,16 @@ class MainActivity : AppCompatActivity() {
                     generateKeyPair(this, keyAliasString)
                     // Encrypt the message with the key accessing it with the alias
                     val clearBytes: ByteArray = message.toByteArray()
-                    val encryptedCombo = rsaEncrypt(clearBytes, keyAliasString)
+                    val encryptedCombo = encrypt(clearBytes, keyAliasString)
                     // For this example store the encrypted message, the initialisation vector that was used and the key alias in the preferences
                     prefs.secretMessageEncrypted = encryptedCombo.cipherBytes
                     prefs.iv = encryptedCombo.iv
                     prefs.keyAlias = keyAliasString
                     // For visual feedback to the user show the encrypted message on the screen
                     secretMessageEncrypted.text = String(encryptedCombo.cipherBytes)
-                    val decryptedMessage = String(rsaDecrypt(encryptedCombo, prefs.keyAlias))
+                    val decryptedMessage = String(decrypt(encryptedCombo, prefs.keyAlias))
                     secretMessagePlain.text = decryptedMessage
-                    val decryptedMessage2 = String(rsaDecrypt(EncryptedCombo(prefs.secretMessageEncrypted, prefs.iv), prefs.keyAlias))
+                    val decryptedMessage2 = String(decrypt(EncryptedCombo(prefs.secretMessageEncrypted, prefs.iv), prefs.keyAlias))
                     Log.d(TAG, "decrypted message from prefs = " + decryptedMessage2)
                     val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS)
@@ -80,7 +79,10 @@ class MainActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_settings -> true
+            R.id.action_list -> {
+                startActivity(Intent(this, SupportedServicesListActivity::class.java))
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -95,7 +97,7 @@ class MainActivity : AppCompatActivity() {
     private fun refreshUI() {
         val decryptedMessage: String
         try {
-            decryptedMessage = String(rsaDecrypt(EncryptedCombo(prefs.secretMessageEncrypted, prefs.iv), prefs.keyAlias))
+            decryptedMessage = String(decrypt(EncryptedCombo(prefs.secretMessageEncrypted, prefs.iv), prefs.keyAlias))
             secretMessageEncrypted.text = String(prefs.secretMessageEncrypted)
             secretMessagePlain.text = decryptedMessage
             secretMessage.setText(decryptedMessage)

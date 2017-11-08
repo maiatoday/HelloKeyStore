@@ -1,10 +1,11 @@
 <resources>
     <string name="app_name">HelloKeyStore</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_list">List services</string>
     <string name="secret_message_hint">Super secret message here</string>
     <string name="plain_text">Plain text</string>
     <string name="encrypted_text">Encrypted text</string>
     <string name="key_alias">Key alias</string>
     <string name="activity_keys_title">Keys</string>
+    <string name="title_activity_supported_services_list">Supported Services</string>
 
 </resources>
