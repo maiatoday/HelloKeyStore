@@ -32,10 +32,10 @@ class MainActivity : AppCompatActivity() {
         prefs = Prefs(this)
         refreshUI()
 
-        fab.setOnClickListener { view ->
+        fab.setOnClickListener {
             startActivityForResult(Intent(this, KeysActivity::class.java), REQUEST_KEY_LIST)
         }
-        buttonLock.setOnClickListener { view ->
+        buttonLock.setOnClickListener {
 
             val keyAliasString = keyAlias.text.toString()
             val message = secretMessage.text.toString()
